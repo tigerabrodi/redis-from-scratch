@@ -46,7 +46,8 @@ client.on('data', (data) => {
         console.log('OK')
         break
       }
-      case 'get': {
+      case 'get':
+      case 'del': {
         console.log(stringifiedData.data)
         break
       }

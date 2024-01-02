@@ -60,6 +60,40 @@ const server = createServer((socket) => {
         break
       }
 
+      case operations.del: {
+        const key = partsOfOperation[1]
+        if (key) {
+          const value = dataMap.get(key)
+          if (value) {
+            dataMap.delete(key)
+            socket.write(
+              createResponse({
+                status: 'OK',
+                type: 'del',
+                data: `Deleted key "${key}"`,
+              })
+            )
+          } else {
+            socket.write(
+              createResponse({
+                status: 'OK',
+                type: 'del',
+                data: `Key ${key} not found`,
+              })
+            )
+          }
+        } else {
+          socket.write(
+            createResponse({
+              status: 'ERROR',
+              data: 'Key is not provided',
+            })
+          )
+        }
+
+        break
+      }
+
       case operations.flushall: {
         dataMap.clear()
         socket.write(
@@ -69,6 +103,8 @@ const server = createServer((socket) => {
             data: null,
           })
         )
+
+        break
       }
 
       default: {

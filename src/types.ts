@@ -13,4 +13,5 @@ export const operations = {
   set: 'set',
   get: 'get',
   flushall: 'flushall',
+  del: 'del',
 } as const
