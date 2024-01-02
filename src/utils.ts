@@ -1,5 +1,5 @@
-import type { ServerResponse } from './types'
+import type { ErrorResponse, SuccessResponse } from './types'
 
-export function createResponse(response: ServerResponse) {
+export function createResponse(response: SuccessResponse | ErrorResponse) {
   return JSON.stringify(response)
 }

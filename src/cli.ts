@@ -1,4 +1,4 @@
-import type { ServerResponse } from './types'
+import type { ErrorResponse, SuccessResponse } from './types'
 
 import { Socket } from 'node:net'
 import * as readline from 'readline'
@@ -35,7 +35,9 @@ rl.on('line', (line) => {
 })
 
 client.on('data', (data) => {
-  const stringifiedData = JSON.parse(data.toString()) as ServerResponse
+  const stringifiedData = JSON.parse(data.toString()) as
+    | SuccessResponse
+    | ErrorResponse
 
   if (stringifiedData.status === 'OK') {
     switch (stringifiedData.type) {
@@ -49,6 +51,10 @@ client.on('data', (data) => {
         break
       }
     }
+  }
+
+  if (stringifiedData.status === 'ERROR') {
+    console.log(stringifiedData.data)
   }
 
   promptUser()

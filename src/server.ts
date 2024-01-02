@@ -70,6 +70,15 @@ const server = createServer((socket) => {
           })
         )
       }
+
+      default: {
+        socket.write(
+          createResponse({
+            data: 'Unknown command',
+            status: 'ERROR',
+          })
+        )
+      }
     }
   })
 
