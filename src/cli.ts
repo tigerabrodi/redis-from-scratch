@@ -1,30 +1,45 @@
 import { Socket } from 'node:net'
+import * as readline from 'readline'
 
 const options = {
   port: 8080,
   host: 'localhost',
 }
 
-// Create a client socket
 const client = new Socket()
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+})
 
 client.connect(options, () => {
   console.log('Connected to server!')
 
-  client.write('Hello, server! Love, Client.')
+  rl.setPrompt('Enter command: ')
+  rl.prompt()
+
+  rl.on('line', (line) => {
+    if (line === 'quit') {
+      client.end()
+      rl.close()
+    } else {
+      client.write(line)
+    }
+  })
 })
 
 client.on('data', (data) => {
-  console.log('Received: ' + data)
-  client.end()
+  console.log('Received: ' + data.toString())
+  rl.prompt()
 })
 
-// Handle connection closure
 client.on('close', () => {
   console.log('Connection closed')
+  process.exit(0)
 })
 
-// Handle errors
 client.on('error', (err) => {
   console.error('An error occurred:', err)
+  process.exit(1)
 })
