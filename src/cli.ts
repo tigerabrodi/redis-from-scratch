@@ -30,7 +30,13 @@ client.connect(options, () => {
 })
 
 client.on('data', (data) => {
-  console.log('Received: ' + data.toString())
+  const stringifiedData = data.toString()
+
+  switch (stringifiedData) {
+    case 'OK':
+      console.log('OK')
+  }
+
   rl.prompt()
 })
 

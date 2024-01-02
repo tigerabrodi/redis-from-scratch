@@ -1,11 +1,25 @@
 import { createServer } from 'node:net'
 
+const dataMap = new Map<string, string>()
+
 const server = createServer((socket) => {
   console.log('client connected')
 
   socket.on('data', (data) => {
-    console.log('data received: ' + data)
-    socket.write('Echo: ' + data)
+    const stringifiedData = data.toString()
+    const operation = stringifiedData.split(' ')[0].toLowerCase()
+
+    switch (operation) {
+      case 'set':
+        const key = stringifiedData.split(' ')[1]
+        const value = stringifiedData.split(' ')[2]
+        if (key && value) {
+          dataMap.set(key, value)
+          socket.write('OK')
+        } else {
+          socket.write('ERROR')
+        }
+    }
   })
 
   socket.on('end', () => {
