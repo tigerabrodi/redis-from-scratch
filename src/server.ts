@@ -7,18 +7,20 @@ const server = createServer((socket) => {
 
   socket.on('data', (data) => {
     const stringifiedData = data.toString()
-    const operation = stringifiedData.split(' ')[0].toLowerCase()
+    const partsOfOperation = stringifiedData.split(' ')
+    const operation = partsOfOperation[0].toLowerCase()
 
     switch (operation) {
-      case 'set':
-        const key = stringifiedData.split(' ')[1]
-        const value = stringifiedData.split(' ')[2]
+      case 'set': {
+        const key = partsOfOperation[1]
+        const value = partsOfOperation[2]
         if (key && value) {
           dataMap.set(key, value)
           socket.write('OK')
         } else {
           socket.write('ERROR')
         }
+      }
     }
   })
 
