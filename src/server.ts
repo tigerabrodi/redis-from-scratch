@@ -127,7 +127,14 @@ const server = createServer((socket) => {
             operation === operations.lpop
               ? currentValue.shift()
               : currentValue.pop()
-          dataMap.set(key, currentValue)
+
+          const isCurrentValueEmpty = currentValue.length === 0
+
+          if (isCurrentValueEmpty) {
+            dataMap.delete(key)
+          } else {
+            dataMap.set(key, currentValue)
+          }
 
           socket.write(
             createResponse({
