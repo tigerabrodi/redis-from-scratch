@@ -93,12 +93,12 @@ const server = createServer((socket) => {
         const key = partsOfOperation[1]
         if (key) {
           const value = dataMap.get(key)
-          if (value) {
+          if (value && typeof value === 'string') {
             socket.write(
               createResponse({
                 status: 'OK',
                 type: 'get',
-                data: value as string,
+                data: value,
               })
             )
           } else {
