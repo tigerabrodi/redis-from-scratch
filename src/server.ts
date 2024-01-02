@@ -1,14 +1,33 @@
-import { writeFile } from 'node:fs/promises'
+import { writeFile, readFile } from 'node:fs/promises'
 import { createServer } from 'node:net'
 
 import { operations } from './types'
 import { createResponse } from './utils'
+
+// 1. TODO: Handle lpush, rpush, lpop, rpop, lrange
+
+// 2. TODO: Handle Sets: sadd, srem, scard, smembers, sismember
+
+// 3. TODO: Handle TTL: expire, ttl
 
 const dataMap = new Map<string, string>()
 
 async function saveDataToFile() {
   const dataToSave = Object.fromEntries(dataMap.entries())
   await writeFile('./data.json', JSON.stringify(dataToSave, null, 2))
+}
+
+async function loadDataFromFile() {
+  try {
+    const fileContent = await readFile('./data.json', 'utf8')
+    const jsonData = JSON.parse(fileContent)
+    for (const [key, value] of Object.entries(jsonData)) {
+      dataMap.set(key, value as string)
+    }
+  } catch (err) {
+    // File problems, start off with clean Map
+    dataMap.clear()
+  }
 }
 
 const server = createServer((socket) => {
@@ -222,6 +241,12 @@ const server = createServer((socket) => {
   })
 })
 
-server.listen(8080, () => {
-  console.log('Server listening on port 8080')
-})
+loadDataFromFile()
+  .then(() => {
+    server.listen(8080, () => {
+      console.log('Server listening on port 8080')
+    })
+  })
+  .catch((error) => {
+    console.error('Error loading data:', error)
+  })
