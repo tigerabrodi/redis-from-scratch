@@ -11,11 +11,11 @@ const dataMapSet = new Map<string, Set<string>>()
 async function saveDataToFile() {
   const mapToSave = Object.fromEntries(dataMap.entries())
   const mapSetToSave = Object.fromEntries(dataMapSet.entries())
-  const writeMapToFilePromise = await writeFile(
+  const writeMapToFilePromise = writeFile(
     './map.json',
     JSON.stringify(mapToSave, null, 2)
   )
-  const writeMapSetToFilePromise = await writeFile(
+  const writeMapSetToFilePromise = writeFile(
     './mapSet.json',
     JSON.stringify(mapSetToSave, null, 2)
   )
