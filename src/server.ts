@@ -4,7 +4,7 @@ import { createServer } from 'node:net'
 import { operations } from './types'
 import { createResponse } from './utils'
 
-// 1. TODO: Handle rpush, lpop, rpop, lrange
+// 1. TODO: Handle lpop, rpop, lrange
 
 // 2. TODO: Handle Sets: sadd, srem, scard, smembers, sismember
 
@@ -121,7 +121,7 @@ const server = createServer((socket) => {
         const value = partsOfOperation[2]
         const currentValue = dataMap.get(key) || []
 
-        if (key && value) {
+        if (key && value && Array.isArray(currentValue)) {
           const newValue =
             operation === operations.lpush
               ? [value, ...currentValue]
@@ -139,7 +139,7 @@ const server = createServer((socket) => {
           socket.write(
             createResponse({
               status: 'ERROR',
-              data: 'Key or value is not provided',
+              data: 'Key or value is not provided. Or key is not a list.',
             })
           )
         }
