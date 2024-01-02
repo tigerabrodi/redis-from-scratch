@@ -16,4 +16,5 @@ export const operations = {
   del: 'del',
   keys: 'keys',
   exists: 'exists',
+  quit: 'quit',
 } as const

@@ -1,9 +1,15 @@
+import { writeFile } from 'node:fs/promises'
 import { createServer } from 'node:net'
 
 import { operations } from './types'
 import { createResponse } from './utils'
 
 const dataMap = new Map<string, string>()
+
+async function saveDataToFile() {
+  const dataToSave = Object.fromEntries(dataMap.entries())
+  await writeFile('./data.json', JSON.stringify(dataToSave, null, 2))
+}
 
 const server = createServer((socket) => {
   console.log('client connected')
@@ -12,6 +18,38 @@ const server = createServer((socket) => {
     const stringifiedData = data.toString()
     const partsOfOperation = stringifiedData.split(' ')
     const operation = partsOfOperation[0].toLowerCase()
+
+    if (operation === operations.quit) {
+      saveDataToFile()
+        .then(() => {
+          console.log('Data saved to file.')
+
+          socket.write(
+            createResponse({
+              status: 'OK',
+              type: 'quit',
+              data: 'Data saved and server shutting down.\n',
+            }),
+            () => {
+              socket.end()
+            }
+          )
+        })
+        .catch((error) => {
+          console.error('Error saving data:', error)
+          socket.write(
+            createResponse({
+              status: 'ERROR',
+              data: 'Error saving data',
+            }),
+            () => {
+              socket.end()
+            }
+          )
+        })
+
+      return
+    }
 
     switch (operation) {
       case operations.set: {

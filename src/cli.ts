@@ -27,8 +27,7 @@ const promptUser = () => {
 
 rl.on('line', (line) => {
   if (line === 'quit') {
-    client.end()
-    rl.close()
+    client.write('quit')
   } else {
     client.write(line)
   }
@@ -46,6 +45,14 @@ client.on('data', (data) => {
         console.log('OK')
         break
       }
+
+      case 'quit': {
+        console.log('Server closed the connection')
+        rl.close()
+        client.destroy()
+        return
+      }
+
       case 'get':
       case 'del':
       case 'keys':
@@ -65,6 +72,7 @@ client.on('data', (data) => {
 
 client.on('close', () => {
   console.log('Connection closed')
+  rl.close()
   process.exit(0)
 })
 
