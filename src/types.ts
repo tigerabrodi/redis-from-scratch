@@ -14,4 +14,5 @@ export const operations = {
   get: 'get',
   flushall: 'flushall',
   del: 'del',
+  keys: 'keys',
 } as const

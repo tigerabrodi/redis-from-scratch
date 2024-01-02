@@ -60,6 +60,30 @@ const server = createServer((socket) => {
         break
       }
 
+      case operations.keys: {
+        const keys = Array.from(dataMap.keys())
+        const asterisk = partsOfOperation[1]
+
+        if (asterisk === '*') {
+          socket.write(
+            createResponse({
+              status: 'OK',
+              type: 'keys',
+              data: keys.join(', '),
+            })
+          )
+        } else {
+          socket.write(
+            createResponse({
+              status: 'ERROR',
+              data: 'Unknown command',
+            })
+          )
+        }
+
+        break
+      }
+
       case operations.del: {
         const key = partsOfOperation[1]
         if (key) {
