@@ -36,3 +36,9 @@ Multiplexing I/O is what allows a single thread to manage multiple connections
 - Distributed log. A distributed log is a method of recording and sharing data across multiple servers or systems in a way that preserves the chronological order of events.
 - Rate limiter.
 - Gaming leaderboards.
+
+# TCP server
+
+A TCP server is a server that listens for TCP connections from the clients through the Transmission Control Protocol (TCP).
+
+TCP protocol is one of the main protocols of the Internet protocol suite.
