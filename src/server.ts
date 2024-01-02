@@ -115,6 +115,37 @@ const server = createServer((socket) => {
         break
       }
 
+      case operations.lpop: {
+        const key = partsOfOperation[1]
+        const currentValue = dataMap.get(key)
+        if (
+          key &&
+          currentValue &&
+          Array.isArray(currentValue) &&
+          currentValue.length > 0
+        ) {
+          const poppedValue = currentValue.shift()
+          dataMap.set(key, currentValue)
+
+          socket.write(
+            createResponse({
+              status: 'OK',
+              type: 'lpop',
+              data: JSON.stringify(poppedValue),
+            })
+          )
+        } else {
+          socket.write(
+            createResponse({
+              status: 'ERROR',
+              data: 'Key is not provided or is not a list or list is empty.',
+            })
+          )
+        }
+
+        break
+      }
+
       case operations.lpush:
       case operations.rpush: {
         const key = partsOfOperation[1]

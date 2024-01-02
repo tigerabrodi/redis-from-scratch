@@ -19,4 +19,5 @@ export const operations = {
   quit: 'quit',
   lpush: 'lpush',
   rpush: 'rpush',
+  lpop: 'lpop',
 } as const

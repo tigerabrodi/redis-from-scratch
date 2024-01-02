@@ -58,7 +58,8 @@ client.on('data', (data) => {
       case 'keys':
       case 'exists':
       case 'lpush':
-      case 'rpush': {
+      case 'rpush':
+      case 'lpop': {
         console.log(stringifiedData.data)
         break
       }
