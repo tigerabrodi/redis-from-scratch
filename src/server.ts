@@ -1,6 +1,6 @@
-import type { ServerResponse } from './types'
-
 import { createServer } from 'node:net'
+
+import { createResponse } from './utils'
 
 const operations = {
   set: 'set',
@@ -24,13 +24,13 @@ const server = createServer((socket) => {
         if (key && value) {
           dataMap.set(key, value)
 
-          const response: ServerResponse = {
-            status: 'OK',
-            type: 'set',
-            data: value,
-          }
-
-          socket.write(JSON.stringify(response))
+          socket.write(
+            createResponse({
+              status: 'OK',
+              type: 'set',
+              data: value,
+            })
+          )
         } else {
           socket.write('ERROR')
         }
@@ -43,13 +43,13 @@ const server = createServer((socket) => {
         if (key) {
           const value = dataMap.get(key)
           if (value) {
-            const response: ServerResponse = {
-              status: 'OK',
-              type: 'get',
-              data: value,
-            }
-
-            socket.write(JSON.stringify(response))
+            socket.write(
+              createResponse({
+                status: 'OK',
+                type: 'get',
+                data: value,
+              })
+            )
           } else {
             socket.write('ERROR')
           }
