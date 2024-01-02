@@ -1,6 +1,5 @@
 import { Socket } from 'node:net'
 import * as readline from 'readline'
-import { Writable } from 'stream'
 
 const options = {
   port: 8080,
@@ -9,42 +8,39 @@ const options = {
 
 const client = new Socket()
 
-// Create a dummy output stream that doesn't actually write anywhere, so we do not see the echo of the command we send to the server
-const dummyOutputStream = new Writable({
-  write(chunk, encoding, callback) {
-    callback()
-  },
-})
-
 const rl = readline.createInterface({
   input: process.stdin,
-  output: dummyOutputStream,
+  output: process.stdout,
+  terminal: false, // Disable automatic line output by readline to prevent echo
 })
 
 client.connect(options, () => {
   console.log('Connected to server!')
+  promptUser()
+})
 
-  rl.setPrompt('Enter command: ')
-  rl.prompt()
+const promptUser = () => {
+  process.stdout.write('Enter command: ')
+}
 
-  rl.on('line', (line) => {
-    if (line === 'quit') {
-      client.end()
-      rl.close()
-    } else {
-      client.write(line)
-    }
-  })
+rl.on('line', (line) => {
+  if (line === 'quit') {
+    client.end()
+    rl.close()
+  } else {
+    client.write(line)
+  }
 })
 
 client.on('data', (data) => {
   const stringifiedData = data.toString()
+
   switch (stringifiedData) {
     case 'OK':
       console.log('OK')
   }
 
-  rl.prompt()
+  promptUser()
 })
 
 client.on('close', () => {
