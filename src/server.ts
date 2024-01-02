@@ -4,25 +4,43 @@ import { createServer } from 'node:net'
 import { operations } from './types'
 import { createResponse } from './utils'
 
-// 2. TODO: Handle Sets: sadd, srem, scard, smembers, sismember
-
 const dataMap = new Map<string, Array<string> | string>()
+
+const dataMapSet = new Map<string, Set<string>>()
 
 async function saveDataToFile() {
   const mapToSave = Object.fromEntries(dataMap.entries())
-  await writeFile('./map.json', JSON.stringify(mapToSave, null, 2))
+  const mapSetToSave = Object.fromEntries(dataMapSet.entries())
+  const writeMapToFilePromise = await writeFile(
+    './map.json',
+    JSON.stringify(mapToSave, null, 2)
+  )
+  const writeMapSetToFilePromise = await writeFile(
+    './mapSet.json',
+    JSON.stringify(mapSetToSave, null, 2)
+  )
+  await Promise.all([writeMapToFilePromise, writeMapSetToFilePromise])
 }
 
 async function loadDataFromFile() {
   try {
-    const mapFileContent = await readFile('./map.json', 'utf8')
+    const [mapFileContent, mapSetFileContent] = await Promise.all([
+      readFile('./map.json', 'utf8'),
+      readFile('./mapSet.json', 'utf8'),
+    ])
     const mapJsonData = JSON.parse(mapFileContent)
+    const mapSetJsonData = JSON.parse(mapSetFileContent)
     for (const [key, value] of Object.entries(mapJsonData)) {
       dataMap.set(key, value as string)
     }
+
+    for (const [key, value] of Object.entries(mapSetJsonData)) {
+      dataMapSet.set(key, new Set(value as Array<string>))
+    }
   } catch (err) {
-    // File problems, start off with clean Map
+    // File problems, start off with clean Map and MapSet
     dataMap.clear()
+    dataMapSet.clear()
   }
 }
 
