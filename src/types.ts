@@ -18,4 +18,5 @@ export const operations = {
   exists: 'exists',
   quit: 'quit',
   lpush: 'lpush',
+  rpush: 'rpush',
 } as const

@@ -4,7 +4,7 @@ import { createServer } from 'node:net'
 import { operations } from './types'
 import { createResponse } from './utils'
 
-// 1. TODO: Handle lpush, rpush, lpop, rpop, lrange
+// 1. TODO: Handle rpush, lpop, rpop, lrange
 
 // 2. TODO: Handle Sets: sadd, srem, scard, smembers, sismember
 
@@ -115,13 +115,17 @@ const server = createServer((socket) => {
         break
       }
 
-      case operations.lpush: {
+      case operations.lpush:
+      case operations.rpush: {
         const key = partsOfOperation[1]
         const value = partsOfOperation[2]
         const currentValue = dataMap.get(key) || []
 
         if (key && value) {
-          const newValue = [value, ...currentValue]
+          const newValue =
+            operation === operations.lpush
+              ? [value, ...currentValue]
+              : [...currentValue, value]
           dataMap.set(key, newValue)
 
           socket.write(
@@ -139,6 +143,8 @@ const server = createServer((socket) => {
             })
           )
         }
+
+        break
       }
 
       case operations.keys: {
