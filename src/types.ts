@@ -21,4 +21,5 @@ export const operations = {
   rpush: 'rpush',
   lpop: 'lpop',
   rpop: 'rpop',
+  lrange: 'lrange',
 } as const

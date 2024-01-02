@@ -155,6 +155,93 @@ const server = createServer((socket) => {
         break
       }
 
+      case operations.lrange: {
+        const key = partsOfOperation[1]
+        const startIndex = Number(partsOfOperation[2])
+        const endIndex = Number(partsOfOperation[3])
+        const ALL_TO_END_INDEX = -1
+
+        const currentValue = dataMap.get(key)
+
+        const shouldExtractRange =
+          key &&
+          currentValue &&
+          Array.isArray(currentValue) &&
+          currentValue.length > 0 &&
+          !Number.isNaN(startIndex) &&
+          !Number.isNaN(endIndex)
+
+        if (shouldExtractRange) {
+          const isStartIndexNegative = startIndex < 0
+          const isEndIndexNegative =
+            endIndex < 0 && endIndex !== ALL_TO_END_INDEX
+          if (isStartIndexNegative && isEndIndexNegative) {
+            socket.write(
+              createResponse({
+                status: 'ERROR',
+                data: 'Start and end index cannot be negative. -1 for end index however means all the way to end of list.',
+              })
+            )
+
+            return
+          }
+
+          const isStartIndexGreaterThanEndIndex =
+            startIndex > endIndex && endIndex !== ALL_TO_END_INDEX
+          if (isStartIndexGreaterThanEndIndex) {
+            socket.write(
+              createResponse({
+                status: 'ERROR',
+                data: 'Start index cannot be greater than end index.',
+              })
+            )
+
+            return
+          }
+
+          const isStartIndexGreaterThanLength =
+            startIndex > currentValue.length - 1
+          const isEndIndexGreaterThanLength = endIndex > currentValue.length - 1
+
+          if (isStartIndexGreaterThanLength || isEndIndexGreaterThanLength) {
+            socket.write(
+              createResponse({
+                status: 'ERROR',
+                data: 'Start or end index cannot be greater than length of list.',
+              })
+            )
+
+            return
+          }
+
+          const shouldGetTillEnd = endIndex === ALL_TO_END_INDEX
+          const shouldGetAll = startIndex === 0 && shouldGetTillEnd
+
+          const extractedRange = shouldGetAll
+            ? currentValue
+            : shouldGetTillEnd
+            ? currentValue.slice(startIndex)
+            : currentValue.slice(startIndex, endIndex + 1)
+
+          socket.write(
+            createResponse({
+              status: 'OK',
+              type: 'lrange',
+              data: JSON.stringify(extractedRange),
+            })
+          )
+        } else {
+          socket.write(
+            createResponse({
+              status: 'ERROR',
+              data: 'Key is not provided or is not a list or list is empty.',
+            })
+          )
+        }
+
+        break
+      }
+
       case operations.lpush:
       case operations.rpush: {
         const key = partsOfOperation[1]
