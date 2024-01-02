@@ -1,11 +1,7 @@
 import { createServer } from 'node:net'
 
+import { operations } from './types'
 import { createResponse } from './utils'
-
-const operations = {
-  set: 'set',
-  get: 'get',
-} as const
 
 const dataMap = new Map<string, string>()
 
@@ -56,6 +52,17 @@ const server = createServer((socket) => {
         }
 
         break
+      }
+
+      case operations.flushall: {
+        dataMap.clear()
+        socket.write(
+          createResponse({
+            status: 'OK',
+            type: 'flushall',
+            data: null,
+          })
+        )
       }
     }
   })

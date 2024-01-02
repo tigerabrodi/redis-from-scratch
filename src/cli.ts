@@ -39,7 +39,8 @@ client.on('data', (data) => {
 
   if (stringifiedData.status === 'OK') {
     switch (stringifiedData.type) {
-      case 'set': {
+      case 'set':
+      case 'flushall': {
         console.log('OK')
         break
       }
