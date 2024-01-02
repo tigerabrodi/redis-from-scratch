@@ -1,5 +1,9 @@
 import { createServer } from 'node:net'
 
+const operations = {
+  set: 'set',
+} as const
+
 const dataMap = new Map<string, string>()
 
 const server = createServer((socket) => {
@@ -11,7 +15,7 @@ const server = createServer((socket) => {
     const operation = partsOfOperation[0].toLowerCase()
 
     switch (operation) {
-      case 'set': {
+      case operations.set: {
         const key = partsOfOperation[1]
         const value = partsOfOperation[2]
         if (key && value) {
