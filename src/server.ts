@@ -9,15 +9,15 @@ import { createResponse } from './utils'
 const dataMap = new Map<string, Array<string> | string>()
 
 async function saveDataToFile() {
-  const dataToSave = Object.fromEntries(dataMap.entries())
-  await writeFile('./data.json', JSON.stringify(dataToSave, null, 2))
+  const mapToSave = Object.fromEntries(dataMap.entries())
+  await writeFile('./map.json', JSON.stringify(mapToSave, null, 2))
 }
 
 async function loadDataFromFile() {
   try {
-    const fileContent = await readFile('./data.json', 'utf8')
-    const jsonData = JSON.parse(fileContent)
-    for (const [key, value] of Object.entries(jsonData)) {
+    const mapFileContent = await readFile('./map.json', 'utf8')
+    const mapJsonData = JSON.parse(mapFileContent)
+    for (const [key, value] of Object.entries(mapJsonData)) {
       dataMap.set(key, value as string)
     }
   } catch (err) {
