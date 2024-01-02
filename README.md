@@ -28,3 +28,11 @@ Key points:
 Multiplexing I/O is what allows a single thread to manage multiple connections
 
 # Use cases for Redis
+
+- Cache objects to speed up reads.
+  - Set right TTL.
+  - Handle thundering herd on cold start.
+- Session store.
+- Distributed log. A distributed log is a method of recording and sharing data across multiple servers or systems in a way that preserves the chronological order of events.
+- Rate limiter.
+- Gaming leaderboards.
