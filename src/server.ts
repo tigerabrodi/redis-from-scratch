@@ -47,7 +47,13 @@ const server = createServer((socket) => {
               })
             )
           } else {
-            socket.write('ERROR')
+            socket.write(
+              createResponse({
+                status: 'OK',
+                type: 'get',
+                data: null,
+              })
+            )
           }
         }
 
