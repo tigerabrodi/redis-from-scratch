@@ -8,9 +8,7 @@ import { createResponse } from './utils'
 
 // 2. TODO: Handle Sets: sadd, srem, scard, smembers, sismember
 
-// 3. TODO: Handle TTL: expire, ttl
-
-const dataMap = new Map<string, string>()
+const dataMap = new Map<string, Array<string> | string>()
 
 async function saveDataToFile() {
   const dataToSave = Object.fromEntries(dataMap.entries())
@@ -100,7 +98,7 @@ const server = createServer((socket) => {
               createResponse({
                 status: 'OK',
                 type: 'get',
-                data: value,
+                data: value as string,
               })
             )
           } else {
@@ -115,6 +113,32 @@ const server = createServer((socket) => {
         }
 
         break
+      }
+
+      case operations.lpush: {
+        const key = partsOfOperation[1]
+        const value = partsOfOperation[2]
+        const currentValue = dataMap.get(key) || []
+
+        if (key && value) {
+          const newValue = [value, ...currentValue]
+          dataMap.set(key, newValue)
+
+          socket.write(
+            createResponse({
+              status: 'OK',
+              type: 'lpush',
+              data: `List item added. Length of list is now ${newValue.length}.`,
+            })
+          )
+        } else {
+          socket.write(
+            createResponse({
+              status: 'ERROR',
+              data: 'Key or value is not provided',
+            })
+          )
+        }
       }
 
       case operations.keys: {
