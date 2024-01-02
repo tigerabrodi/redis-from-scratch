@@ -84,6 +84,39 @@ const server = createServer((socket) => {
         break
       }
 
+      case operations.exists: {
+        const key = partsOfOperation[1]
+        if (key) {
+          const value = dataMap.get(key)
+          if (value) {
+            socket.write(
+              createResponse({
+                status: 'OK',
+                type: 'exists',
+                data: JSON.stringify(true),
+              })
+            )
+          } else {
+            socket.write(
+              createResponse({
+                status: 'OK',
+                type: 'exists',
+                data: JSON.stringify(false),
+              })
+            )
+          }
+        } else {
+          socket.write(
+            createResponse({
+              status: 'ERROR',
+              data: 'Key is not provided',
+            })
+          )
+        }
+
+        break
+      }
+
       case operations.del: {
         const key = partsOfOperation[1]
         if (key) {

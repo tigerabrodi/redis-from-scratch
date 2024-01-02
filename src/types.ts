@@ -15,4 +15,5 @@ export const operations = {
   flushall: 'flushall',
   del: 'del',
   keys: 'keys',
+  exists: 'exists',
 } as const
