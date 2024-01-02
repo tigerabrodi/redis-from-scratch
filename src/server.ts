@@ -4,8 +4,6 @@ import { createServer } from 'node:net'
 import { operations } from './types'
 import { createResponse } from './utils'
 
-// 1. TODO: Handle lpop, rpop, lrange
-
 // 2. TODO: Handle Sets: sadd, srem, scard, smembers, sismember
 
 const dataMap = new Map<string, Array<string> | string>()
@@ -115,7 +113,8 @@ const server = createServer((socket) => {
         break
       }
 
-      case operations.lpop: {
+      case operations.lpop:
+      case operations.rpop: {
         const key = partsOfOperation[1]
         const currentValue = dataMap.get(key)
         if (
@@ -124,7 +123,10 @@ const server = createServer((socket) => {
           Array.isArray(currentValue) &&
           currentValue.length > 0
         ) {
-          const poppedValue = currentValue.shift()
+          const poppedValue =
+            operation === operations.lpop
+              ? currentValue.shift()
+              : currentValue.pop()
           dataMap.set(key, currentValue)
 
           socket.write(
