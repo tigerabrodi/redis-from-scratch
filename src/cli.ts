@@ -1,3 +1,5 @@
+import type { ServerResponse } from './types'
+
 import { Socket } from 'node:net'
 import * as readline from 'readline'
 
@@ -33,11 +35,19 @@ rl.on('line', (line) => {
 })
 
 client.on('data', (data) => {
-  const stringifiedData = data.toString()
+  const stringifiedData = JSON.parse(data.toString()) as ServerResponse
 
-  switch (stringifiedData) {
-    case 'OK':
-      console.log('OK')
+  if (stringifiedData.status === 'OK') {
+    switch (stringifiedData.type) {
+      case 'set': {
+        console.log('OK')
+        break
+      }
+      case 'get': {
+        console.log(stringifiedData.data)
+        break
+      }
+    }
   }
 
   promptUser()
