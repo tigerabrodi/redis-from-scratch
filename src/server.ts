@@ -164,6 +164,20 @@ const server = createServer((socket) => {
         const currentValue = dataMapSet.get(key) || new Set<string>()
 
         if (key && value) {
+          const isValueInSet = currentValue.has(value)
+
+          if (isValueInSet) {
+            socket.write(
+              createResponse({
+                status: 'OK',
+                type: 'sadd',
+                data: `Set item already exists. Length of set is ${currentValue.size}.`,
+              })
+            )
+
+            return
+          }
+
           currentValue.add(value)
           dataMapSet.set(key, currentValue)
 
