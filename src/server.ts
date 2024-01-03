@@ -159,14 +159,69 @@ const server = createServer((socket) => {
         break
       }
 
+      case operations.srem: {
+        const key = partsOfOperation[1]
+        const value = partsOfOperation[2]
+
+        if (!key || !value) {
+          socket.write(
+            createResponse({
+              status: 'ERROR',
+              data: 'Key or value is not provided.',
+            })
+          )
+
+          return
+        }
+
+        const isKeyInSet = dataMapSet.has(key)
+
+        if (!isKeyInSet) {
+          socket.write(
+            createResponse({
+              status: 'ERROR',
+              data: 'Key does not exist on Set.',
+            })
+          )
+
+          return
+        }
+
+        dataMapSet.delete(key)
+
+        socket.write(
+          createResponse({
+            status: 'OK',
+            type: 'srem',
+            data: `Key "${key}" deleted.`,
+          })
+        )
+
+        break
+      }
+
       case operations.smembers: {
         const key = partsOfOperation[1]
+        const value = partsOfOperation[2]
         const currentValue = dataMapSet.get(key)
         if (!currentValue) {
           socket.write(
             createResponse({
               status: 'ERROR',
               data: 'Key does not exist on Set.',
+            })
+          )
+
+          return
+        }
+
+        if (value) {
+          const isValueInSet = currentValue.has(value)
+          socket.write(
+            createResponse({
+              status: 'OK',
+              type: 'smembers',
+              data: JSON.stringify(isValueInSet),
             })
           )
 

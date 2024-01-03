@@ -63,7 +63,8 @@ client.on('data', (data) => {
       case 'rpop':
       case 'lrange':
       case 'sadd':
-      case 'smembers': {
+      case 'smembers':
+      case 'srem': {
         console.log(stringifiedData.data)
         break
       }

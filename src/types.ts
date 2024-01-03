@@ -24,4 +24,5 @@ export const operations = {
   lrange: 'lrange',
   sadd: 'sadd',
   smembers: 'smembers',
+  srem: 'srem',
 } as const
