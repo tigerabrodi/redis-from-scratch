@@ -155,6 +155,37 @@ const server = createServer((socket) => {
             })
           )
         }
+
+        break
+      }
+
+      case operations.smembers: {
+        const key = partsOfOperation[1]
+        const currentValue = dataMapSet.get(key)
+        if (!currentValue) {
+          socket.write(
+            createResponse({
+              status: 'ERROR',
+              data: 'Key does not exist on Set.',
+            })
+          )
+
+          return
+        }
+
+        const values = Array.from(currentValue).reduce((acc, curr) => {
+          return acc + `${curr}\n`
+        }, '')
+
+        socket.write(
+          createResponse({
+            status: 'OK',
+            type: 'smembers',
+            data: values,
+          })
+        )
+
+        break
       }
 
       case operations.lpop:
