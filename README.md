@@ -1,5 +1,38 @@
 # Redis from Scratch
 
+This is a project where I built Redis Server and CLI from scratch.
+
+I also store the data to AWS S3 as you quit the CLI. It wasn't necessary, but I wanna get more into cloud so I decided to do it.
+
+This was my first time spinning up a TCP server. :smile:
+
+Overall almost all operations are implemented. TTL is not implemented however. I was thinking whether I should implement it or storing the data on S3. I decided to go with S3 and not worry about TTL at all.
+
+Before S3 I was simply storing the data in two different JSON files. One for the Map of strings and the other for the Map of Sets.
+
+## How to run
+
+Clone the project.
+
+Run `npm install`.
+
+Create a `.env` file and add the following:
+
+```
+AWS_ACCESS_KEY_ID={YOUR_AWS_ACCESS_KEY_ID}
+AWS_SECRET_ACCESS_KEY={YOUR_AWS_SECRET_ACCESS_KEY}
+```
+
+If you don't have AWS setup, create it or change the code to store the data locally.
+
+Open two terminals.
+
+In the first terminal run `npm run start-server`.
+
+In the second terminal run `npm run start-cli`.
+
+The server is a TCP server. The CLI is a TCP client. You use the CLI to send commands to the server.
+
 # What is Redis?
 
 Redis is an in-memory data structure store, used as a distributed, in-memory key-value database, cache, and message broker.
