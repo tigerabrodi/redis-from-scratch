@@ -23,7 +23,7 @@ AWS_ACCESS_KEY_ID={YOUR_AWS_ACCESS_KEY_ID}
 AWS_SECRET_ACCESS_KEY={YOUR_AWS_SECRET_ACCESS_KEY}
 ```
 
-If you don't have AWS setup, create it or change the code to store the data locally.
+If you don't have AWS setup, set it up or change the code to store the data locally to JSON files.
 
 Open two terminals.
 
