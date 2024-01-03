@@ -1,35 +1,61 @@
-import { writeFile, readFile } from 'node:fs/promises'
 import { createServer } from 'node:net'
+
+import AWS from 'aws-sdk'
+import dotenv from 'dotenv'
 
 import { operations } from './types'
 import { createResponse } from './utils'
+dotenv.config()
+
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: 'eu-central-1',
+})
 
 const dataMap = new Map<string, Array<string> | string>()
 
 const dataMapSet = new Map<string, Set<string>>()
 
-async function saveDataToFile() {
+const s3 = new AWS.S3()
+const bucketName = 'redis-from-scratch'
+const mapFileName = 'map.json'
+const mapSetFileName = 'mapSet.json'
+
+async function saveDataToS3() {
   const mapToSave = Object.fromEntries(dataMap.entries())
-  const mapSetToSave = Object.fromEntries(dataMapSet.entries())
-  const writeMapToFilePromise = writeFile(
-    './map.json',
-    JSON.stringify(mapToSave, null, 2)
+  const mapSetToSave = Object.fromEntries(
+    [...dataMapSet].map(([key, val]) => [key, [...val]])
   )
-  const writeMapSetToFilePromise = writeFile(
-    './mapSet.json',
-    JSON.stringify(mapSetToSave, null, 2)
-  )
-  await Promise.all([writeMapToFilePromise, writeMapSetToFilePromise])
+
+  await Promise.all([
+    s3
+      .putObject({
+        Bucket: bucketName,
+        Key: mapFileName,
+        Body: JSON.stringify(mapToSave),
+      })
+      .promise(),
+    s3
+      .putObject({
+        Bucket: bucketName,
+        Key: mapSetFileName,
+        Body: JSON.stringify(mapSetToSave),
+      })
+      .promise(),
+  ])
 }
 
-async function loadDataFromFile() {
+async function loadDataFromS3() {
   try {
-    const [mapFileContent, mapSetFileContent] = await Promise.all([
-      readFile('./map.json', 'utf8'),
-      readFile('./mapSet.json', 'utf8'),
+    const [mapObject, mapSetObject] = await Promise.all([
+      s3.getObject({ Bucket: bucketName, Key: mapFileName }).promise(),
+      s3.getObject({ Bucket: bucketName, Key: mapSetFileName }).promise(),
     ])
-    const mapJsonData = JSON.parse(mapFileContent)
-    const mapSetJsonData = JSON.parse(mapSetFileContent)
+
+    const mapJsonData = JSON.parse(mapObject.Body?.toString() || '{}')
+    const mapSetJsonData = JSON.parse(mapSetObject.Body?.toString() || '{}')
+
     for (const [key, value] of Object.entries(mapJsonData)) {
       dataMap.set(key, value as string)
     }
@@ -38,7 +64,8 @@ async function loadDataFromFile() {
       dataMapSet.set(key, new Set(value as Array<string>))
     }
   } catch (err) {
-    // File problems, start off with clean Map and MapSet
+    // Handle errors, such as file not found
+    console.log('Starting with empty data structures.')
     dataMap.clear()
     dataMapSet.clear()
   }
@@ -53,7 +80,7 @@ const server = createServer((socket) => {
     const operation = partsOfOperation[0].toLowerCase()
 
     if (operation === operations.quit) {
-      saveDataToFile()
+      saveDataToS3()
         .then(() => {
           console.log('Data saved to file.')
 
@@ -528,7 +555,7 @@ const server = createServer((socket) => {
   })
 })
 
-loadDataFromFile()
+loadDataFromS3()
   .then(() => {
     server.listen(8080, () => {
       console.log('Server listening on port 8080')
