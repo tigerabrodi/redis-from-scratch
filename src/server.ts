@@ -131,6 +131,32 @@ const server = createServer((socket) => {
         break
       }
 
+      case operations.sadd: {
+        const key = partsOfOperation[1]
+        const value = partsOfOperation[2]
+        const currentValue = dataMapSet.get(key) || new Set<string>()
+
+        if (key && value) {
+          currentValue.add(value)
+          dataMapSet.set(key, currentValue)
+
+          socket.write(
+            createResponse({
+              status: 'OK',
+              type: 'sadd',
+              data: `Set item added. Length of set is now ${currentValue.size}.`,
+            })
+          )
+        } else {
+          socket.write(
+            createResponse({
+              status: 'ERROR',
+              data: 'Key or value is not provided.',
+            })
+          )
+        }
+      }
+
       case operations.lpop:
       case operations.rpop: {
         const key = partsOfOperation[1]
